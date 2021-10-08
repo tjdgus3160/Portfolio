@@ -1,6 +1,6 @@
 import { CssBaseline } from '@material-ui/core'
 import React from 'react'
-import List from '../components/TodoList/List/List'
+import List from '../components/TodoList/List'
 
 const TodoListContainer = () => {
   return (

@@ -1,6 +1,7 @@
 import { InputBase, makeStyles, Typography } from '@material-ui/core'
 import React, { useState } from 'react'
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
+import clsx from 'clsx'
 
 const useStyle = makeStyles(theme => ({
   root: {
@@ -29,7 +30,7 @@ const Title = () => {
         <InputBase
           value="Todo"
           inputProps={{
-            className: classes.input,
+            className: clsx(classes.input, classes.title),
           }}
           autoFocus
           fullWidth
