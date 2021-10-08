@@ -1,5 +1,6 @@
 import { makeStyles, Paper } from '@material-ui/core'
 import React from 'react'
+import { ICard } from '../../interface/todolist'
 
 const useStyle = makeStyles(theme => ({
   card: {
@@ -8,9 +9,13 @@ const useStyle = makeStyles(theme => ({
   },
 }))
 
-const Card = () => {
+interface Props {
+  card: ICard
+}
+
+const Card = ({ card }: Props) => {
   const classes = useStyle()
-  return <Paper className={classes.card}>todo 1</Paper>
+  return <Paper className={classes.card}>{card.content}</Paper>
 }
 
 export default Card

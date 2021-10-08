@@ -4,6 +4,7 @@ import { alpha, makeStyles } from '@material-ui/core/styles'
 import Title from './Title'
 import Card from './Card'
 import InputCard from './InputCard'
+import { IList } from '../../interface/todolist'
 
 const useStyle = makeStyles(theme => ({
   root: {
@@ -24,17 +25,21 @@ const useStyle = makeStyles(theme => ({
   },
 }))
 
-const List = () => {
+interface Props {
+  list: IList
+}
+
+const List = ({ list }: Props) => {
   const classes = useStyle()
   const [open, setOpen] = useState(false)
+
+  const renderCard = list.cards.map(card => <Card key={card.id} card={card} />)
+
   return (
     <div>
       <Paper className={classes.root}>
-        <Title />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
+        <Title title={list.title} />
+        {renderCard}
         <Collapse in={!open}>
           <Paper
             className={classes.addCard}

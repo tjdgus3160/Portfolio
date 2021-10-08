@@ -21,14 +21,18 @@ const useStyle = makeStyles(theme => ({
   },
 }))
 
-const Title = () => {
+interface Props {
+  title: string
+}
+
+const Title = ({ title }: Props) => {
   const classes = useStyle()
   const [open, setOpen] = useState(false)
   return (
     <div className={classes.root}>
       {open ? (
         <InputBase
-          value="Todo"
+          value={title}
           inputProps={{
             className: clsx(classes.input, classes.title),
           }}
@@ -39,7 +43,7 @@ const Title = () => {
       ) : (
         <>
           <Typography className={classes.title} onClick={() => setOpen(true)}>
-            Todo
+            {title}
           </Typography>
           <MoreHorizIcon />
         </>
