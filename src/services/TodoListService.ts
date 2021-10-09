@@ -1,31 +1,43 @@
 import axios from 'axios'
-import { ITodoList } from '../interface/todolist'
-import SampleTodoList from '../utils/sample/todolist'
+import { ITodo, ITodoForm, ITodoList } from '../interface/todolist'
+import { v4 as uuid } from 'uuid'
+import SampleData from '../utils/sample/todolist'
 
-const API_KEY = '?key=tjdgus0'
-const ROOT_URL = 'http://reduxblog.herokuapp.com/api'
-
-interface Req {
-  id: number
-  title: string
-  categories: string
-  content: string
-}
-
+const LOCALSTORAGE_KEY = 'todolist'
 export default class TodoListService {
-  public static async getTodoList(): Promise<ITodoList | null> {
-    const response = await axios.get<Req[]>(`${ROOT_URL}/posts${API_KEY}`)
-    if (response.data.length === 0) {
-      return null
-    }
-    return JSON.parse(response.data[0].content)
+  public static getTodoList(): ITodoList | null {
+    const data = localStorage.getItem(LOCALSTORAGE_KEY)
+    return data ? JSON.parse(data) : null
   }
-  public static async addList(): Promise<void> {
-    const data = {
-      title: 'todoList',
-      categories: 'todoList',
-      content: JSON.stringify(SampleTodoList),
+
+  public static setTodoList(data: ITodoList): void {
+    localStorage.removeItem(LOCALSTORAGE_KEY)
+    localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data))
+  }
+
+  public static addList() {
+    TodoListService.setTodoList(SampleData)
+  }
+  public static deleteList() {
+    const newState = {}
+    // const data = makeReq(newState)
+    // TodoListService.postTodoList(data)
+  }
+  public static addTodo({ content, listId }: ITodoForm, todoList: ITodoList) {
+    const newTodo: ITodo = {
+      id: uuid(),
+      content,
     }
-    await axios.post(`${ROOT_URL}/posts${API_KEY}`, data)
+    const list = todoList.lists[listId]
+    list.todos = [...list.todos, newTodo]
+
+    const newState: ITodoList = {
+      ...todoList,
+      lists: {
+        ...todoList.lists,
+        [listId]: list,
+      },
+    }
+    TodoListService.setTodoList(newState)
   }
 }

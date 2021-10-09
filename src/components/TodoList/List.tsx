@@ -2,9 +2,9 @@ import { Collapse, Paper, Typography } from '@material-ui/core'
 import React, { useState } from 'react'
 import { alpha, makeStyles } from '@material-ui/core/styles'
 import Title from './Title'
-import Card from './Card'
-import InputCard from './InputCard'
+import InputBox from './InputBox'
 import { IList } from '../../interface/todolist'
+import Todo from './Todo'
 
 const useStyle = makeStyles(theme => ({
   root: {
@@ -12,10 +12,10 @@ const useStyle = makeStyles(theme => ({
     backgroundColor: '#EBECF0',
     marginLeft: theme.spacing(1),
   },
-  cardContainer: {
+  todoContainer: {
     marginTop: theme.spacing(4),
   },
-  addCard: {
+  addTodo: {
     padding: theme.spacing(1, 1, 1, 2),
     margin: theme.spacing(2, 1, 1, 1),
     backgroundColor: '#EBECF0',
@@ -26,14 +26,16 @@ const useStyle = makeStyles(theme => ({
 }))
 
 interface Props {
-  list: IList
+  list: IList | null
 }
 
 const List = ({ list }: Props) => {
   const classes = useStyle()
   const [open, setOpen] = useState(false)
-
-  const renderCard = list.cards.map(card => <Card key={card.id} card={card} />)
+  if (!list) {
+    return <div>Loading...</div>
+  }
+  const renderCard = list.todos.map(todo => <Todo key={todo.id} todo={todo} />)
 
   return (
     <div>
@@ -42,15 +44,15 @@ const List = ({ list }: Props) => {
         {renderCard}
         <Collapse in={!open}>
           <Paper
-            className={classes.addCard}
+            className={classes.addTodo}
             elevation={0}
             onClick={() => setOpen(true)}
           >
-            <Typography>+ Add a Card</Typography>
+            <Typography>+ Add a Todo</Typography>
           </Paper>
         </Collapse>
         <Collapse in={open}>
-          <InputCard setOpen={setOpen} />
+          <InputBox setOpen={setOpen} listId={list.id} />
         </Collapse>
       </Paper>
     </div>

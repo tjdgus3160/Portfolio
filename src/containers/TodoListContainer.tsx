@@ -3,7 +3,12 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import List from '../components/TodoList/List'
 import { RootState } from '../redux/modules/rootReducer'
-import { getTodoList } from '../redux/modules/todoList'
+import {
+  addList,
+  addTodo,
+  deleteList,
+  getTodoList,
+} from '../redux/modules/todoList'
 
 const TodoListContainer = () => {
   const data = useSelector((state: RootState) => state.todoList.todoList)
@@ -13,6 +18,9 @@ const TodoListContainer = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
+    // dispatch(deleteList())
+    // dispatch(addList())
+    // dispatch(addTodo())
     dispatch(getTodoList())
   }, [dispatch])
 

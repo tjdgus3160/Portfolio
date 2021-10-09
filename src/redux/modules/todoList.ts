@@ -1,7 +1,9 @@
-import { ITodoList } from '../../interface/todolist'
+import { ITodoForm, ITodoList } from '../../interface/todolist'
 import { createActions, handleActions } from 'redux-actions'
-import { call, put, takeLatest } from 'redux-saga/effects'
+import { call, put, select, takeLatest } from 'redux-saga/effects'
 import TodoListService from '../../services/TodoListService'
+import { AnyAction } from 'redux'
+import { RootState } from './rootReducer'
 
 export interface TodoListState {
   loading: boolean
@@ -50,9 +52,17 @@ const reducer = handleActions<TodoListState, ITodoList>(
 export default reducer
 
 // saga
-export const { getTodoList, addTodoList } = createActions(
+export const { addTodo, getTodoList, addList, deleteList } = createActions(
+  {
+    ADD_TODO: (content: string, listId: string) => ({
+      content,
+      listId,
+    }),
+  },
   'GET_TODO_LIST',
-  'ADD_TODO_LIST',
+  'ADD_LIST',
+  'DELETE_LIST',
+
   {
     prefix,
   }
@@ -60,6 +70,9 @@ export const { getTodoList, addTodoList } = createActions(
 
 export function* todoListSaga() {
   yield takeLatest(`${prefix}/GET_TODO_LIST`, getTodoListSaga)
+  yield takeLatest(`${prefix}/ADD_LIST`, addListSaga)
+  yield takeLatest(`${prefix}/DELETE_LIST`, deleteListSaga)
+  yield takeLatest(`${prefix}/ADD_TODO`, addTodoSaga)
 }
 
 function* getTodoListSaga() {
@@ -67,6 +80,50 @@ function* getTodoListSaga() {
     yield put(pending())
     const todoList: ITodoList = yield call(TodoListService.getTodoList)
     yield put(success(todoList))
+  } catch (error) {
+    yield put(
+      fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))
+    )
+  }
+}
+
+function* addListSaga() {
+  try {
+    yield put(pending())
+    yield call(TodoListService.addList)
+    yield put(getTodoList())
+  } catch (error) {
+    yield put(
+      fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))
+    )
+  }
+}
+
+function* deleteListSaga() {
+  try {
+    yield put(pending())
+    // yield call(TodoListService.)
+    yield put(getTodoList())
+  } catch (error) {
+    yield put(
+      fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))
+    )
+  }
+}
+
+interface addTodoSagaAction extends AnyAction {
+  payload: ITodoForm
+}
+
+function* addTodoSaga(action: addTodoSagaAction) {
+  try {
+    yield put(pending())
+    const todoList: ITodoList = yield select(
+      (state: RootState) => state.todoList.todoList
+    )
+    yield call(TodoListService.addTodo, action.payload, todoList)
+    const newTodoList: ITodoList = yield call(TodoListService.getTodoList)
+    yield put(success(newTodoList))
   } catch (error) {
     yield put(
       fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))

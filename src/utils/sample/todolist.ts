@@ -1,6 +1,6 @@
-import { ICard, ITodoList } from '../../interface/todolist'
+import { ITodo, ITodoList } from '../../interface/todolist'
 
-const cards: ICard[] = [
+const todos: ITodo[] = [
   {
     id: 'card-1',
     content: 'Learning how to cook',
@@ -20,12 +20,12 @@ const data: ITodoList = {
     'list-1': {
       id: 'list-1',
       title: 'Todo',
-      cards,
+      todos,
     },
     'list-2': {
       id: 'list-2',
       title: 'Doing',
-      cards: [],
+      todos: [],
     },
   },
   listIds: ['list-1', 'list-2'],
