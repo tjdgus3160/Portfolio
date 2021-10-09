@@ -1,5 +1,6 @@
 import {
   IList,
+  IListDeleteForm,
   IListForm,
   IListUpdateForm,
   ITodo,
@@ -125,12 +126,23 @@ export default class TodoListService {
     }
     TodoListService.setTodoList(newState)
   }
-
+  public static deleteList({ listId }: IListDeleteForm, todoList: ITodoList) {
+    const lists = todoList.lists
+    delete lists[listId]
+    const newListIds = todoList.listIds.filter(id => id !== listId)
+    const newState: ITodoList = {
+      lists: {
+        ...lists,
+      },
+      listIds: newListIds,
+    }
+    TodoListService.setTodoList(newState)
+  }
   public static reorder(
-    { destination, source, draggableId, type }: DropResult,
+    { destination, source, draggableId }: DropResult,
     todoList: ITodoList
   ) {
-    if (type === 'list') {
+    if (todoList.listIds.includes(draggableId)) {
       const newListIds = todoList.listIds
       newListIds.splice(source.index, 1)
       newListIds.splice(destination!.index, 0, draggableId)

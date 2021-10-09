@@ -1,4 +1,5 @@
 import {
+  IListDeleteForm,
   IListForm,
   IListUpdateForm,
   ITodoDeleteForm,
@@ -66,9 +67,9 @@ export const {
   updateTodo,
   updateList,
   deleteTodo,
+  deleteList,
   reorder,
   getTodoList,
-  deleteList,
 } = createActions(
   {
     ADD_TODO: (content: string, listId: string) => ({
@@ -91,13 +92,14 @@ export const {
       todoId,
       listId,
     }),
+    DELETE_LIST: (listId: string) => ({
+      listId,
+    }),
     REORDER: (result: DropResult) => ({
       result,
     }),
   },
   'GET_TODO_LIST',
-  'DELETE_LIST',
-
   {
     prefix,
   }
@@ -109,6 +111,7 @@ export function* todoListSaga() {
   yield takeLatest(`${prefix}/UPDATE_TODO`, updateTodoSaga)
   yield takeLatest(`${prefix}/UPDATE_LIST`, updateListSaga)
   yield takeLatest(`${prefix}/DELETE_TODO`, deleteTodoSaga)
+  yield takeLatest(`${prefix}/DELETE_LIST`, deleteListSaga)
   yield takeLatest(`${prefix}/REORDER`, reorderSaga)
   yield takeLatest(`${prefix}/GET_TODO_LIST`, getTodoListSaga)
 }
@@ -213,6 +216,25 @@ function* deleteTodoSaga(action: deleteTodoSagaAction) {
       (state: RootState) => state.todoList.todoList
     )
     yield call(TodoListService.deleteTodo, action.payload, todoList)
+    yield put(getTodoList())
+  } catch (error) {
+    yield put(
+      fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))
+    )
+  }
+}
+
+interface deleteListSagaAction extends AnyAction {
+  payload: IListDeleteForm
+}
+
+function* deleteListSaga(action: deleteListSagaAction) {
+  try {
+    yield put(pending())
+    const todoList: ITodoList = yield select(
+      (state: RootState) => state.todoList.todoList
+    )
+    yield call(TodoListService.deleteList, action.payload, todoList)
     yield put(getTodoList())
   } catch (error) {
     yield put(

@@ -4,17 +4,24 @@ import { Draggable } from 'react-beautiful-dnd'
 import { useDispatch } from 'react-redux'
 import useInput from '../../hooks/useInput'
 import { ITodo } from '../../interface/todolist'
-import { updateTodo } from '../../redux/modules/todoList'
+import { deleteTodo, updateTodo } from '../../redux/modules/todoList'
+import CloseIcon from '@material-ui/icons/Close'
 
 const useStyle = makeStyles(theme => ({
   todo: {
     padding: theme.spacing(1, 1, 1, 2),
     margin: theme.spacing(1),
+    position: 'relative',
   },
   input: {
     '&:focus': {
       background: '#ddd',
     },
+  },
+  icon: {
+    position: 'absolute',
+    right: '10px',
+    cursor: 'pointer',
   },
 }))
 
@@ -35,6 +42,10 @@ const Todo = ({ todo, index, listId }: Props) => {
     dispatch(updateTodo(content, todo.id, listId))
     setOpen(false)
   }, [dispatch, content, todo, listId])
+
+  const onBtnClick = useCallback(() => {
+    dispatch(deleteTodo(todo.id, listId))
+  }, [dispatch, todo, listId])
 
   return (
     <Draggable draggableId={todo.id} index={index}>
@@ -57,7 +68,14 @@ const Todo = ({ todo, index, listId }: Props) => {
                 onBlur={onInputBlur}
               />
             ) : (
-              <>{content}</>
+              <>
+                {content}
+                <CloseIcon
+                  className={classes.icon}
+                  fontSize="small"
+                  onClick={onBtnClick}
+                />
+              </>
             )}
           </Paper>
         </div>

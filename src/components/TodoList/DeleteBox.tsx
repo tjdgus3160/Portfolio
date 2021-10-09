@@ -19,10 +19,10 @@ const useStyle = makeStyles(theme => ({
   },
 }))
 
-const DeleteButton = () => {
+const DeleteBox = () => {
   const classes = useStyle()
   return (
-    <Droppable droppableId="delete">
+    <Droppable droppableId="delete" type="list">
       {provided => (
         <div
           ref={provided.innerRef}
@@ -30,10 +30,11 @@ const DeleteButton = () => {
           className={classes.root}
         >
           <DeleteIcon className={classes.icon} />
+          {provided.placeholder}
         </div>
       )}
     </Droppable>
   )
 }
 
-export default DeleteButton
+export default DeleteBox

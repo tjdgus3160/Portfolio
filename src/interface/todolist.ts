@@ -18,6 +18,9 @@ export interface IListForm {
 export interface IListUpdateForm extends IListForm {
   listId: string
 }
+export interface IListDeleteForm {
+  listId: string
+}
 export interface ITodoForm {
   listId: string
   content: string

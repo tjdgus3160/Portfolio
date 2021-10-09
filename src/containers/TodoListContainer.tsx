@@ -4,12 +4,12 @@ import { useDispatch } from 'react-redux'
 import AddButton from '../components/TodoList/AddButton'
 import List from '../components/TodoList/List'
 import useTodoList from '../hooks/useTodoList'
-import { deleteTodo, getTodoList, reorder } from '../redux/modules/todoList'
+import { deleteList, getTodoList, reorder } from '../redux/modules/todoList'
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd'
 import TopBar from '../components/TodoList/TopBar'
 import SideMenu from '../components/TodoList/SideMenu'
 import TodoListService from '../services/TodoListService'
-import DeleteButton from '../components/TodoList/DeleteButton'
+import DeleteBox from '../components/TodoList/DeleteBox'
 
 const useStyle = makeStyles(theme => ({
   root: {
@@ -44,7 +44,7 @@ const TodoListContainer = () => {
     (result: DropResult) => {
       if (!result.destination) return
       if (result.destination.droppableId === 'delete') {
-        dispatch(deleteTodo(result.draggableId, result.source.droppableId))
+        dispatch(deleteList(result.draggableId))
       } else {
         dispatch(reorder(result))
       }
@@ -67,7 +67,8 @@ const TodoListContainer = () => {
               <CssBaseline />
               {lists}
               <AddButton type="list" />
-              <DeleteButton />
+              <DeleteBox />
+              {provided.placeholder}
             </div>
           )}
         </Droppable>
