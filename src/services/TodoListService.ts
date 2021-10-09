@@ -3,6 +3,7 @@ import {
   IListForm,
   IListUpdateForm,
   ITodo,
+  ITodoDeleteForm,
   ITodoForm,
   ITodoList,
   ITodoUpdateForm,
@@ -101,6 +102,25 @@ export default class TodoListService {
       lists: {
         ...todoList.lists,
         [listId]: list,
+      },
+    }
+    TodoListService.setTodoList(newState)
+  }
+
+  public static deleteTodo(
+    { todoId, listId }: ITodoDeleteForm,
+    todoList: ITodoList
+  ) {
+    const todos = todoList.lists[listId].todos
+    const newTodos = todos.filter(todo => todo.id !== todoId)
+    const newState: ITodoList = {
+      ...todoList,
+      lists: {
+        ...todoList.lists,
+        [listId]: {
+          ...todoList.lists[listId],
+          todos: newTodos,
+        },
       },
     }
     TodoListService.setTodoList(newState)

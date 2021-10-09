@@ -26,3 +26,8 @@ export interface ITodoForm {
 export interface ITodoUpdateForm extends ITodoForm {
   todoId: string
 }
+
+export interface ITodoDeleteForm {
+  listId: string
+  todoId: string
+}
