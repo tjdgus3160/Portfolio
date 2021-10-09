@@ -6,7 +6,7 @@ import {
   Typography,
 } from '@material-ui/core'
 import React, { useState } from 'react'
-import InputBox from './TodoList/InputBox'
+import InputBox from './InputBox'
 
 const useStyle = makeStyles(theme => ({
   root: {

@@ -9,6 +9,7 @@ import { call, put, select, takeLatest } from 'redux-saga/effects'
 import TodoListService from '../../services/TodoListService'
 import { AnyAction } from 'redux'
 import { RootState } from './rootReducer'
+import { DropResult } from 'react-beautiful-dnd'
 
 export interface TodoListState {
   loading: boolean
@@ -57,33 +58,43 @@ const reducer = handleActions<TodoListState, ITodoList>(
 export default reducer
 
 // saga
-export const { addTodo, addList, updateList, getTodoList, deleteList } =
-  createActions(
-    {
-      ADD_TODO: (content: string, listId: string) => ({
-        content,
-        listId,
-      }),
-      ADD_LIST: (title: string) => ({
-        title,
-      }),
-      UPDATE_LIST: (title: string, listId: string) => ({
-        title,
-        listId,
-      }),
-    },
-    'GET_TODO_LIST',
-    'DELETE_LIST',
+export const {
+  addTodo,
+  addList,
+  updateList,
+  reorder,
+  getTodoList,
+  deleteList,
+} = createActions(
+  {
+    ADD_TODO: (content: string, listId: string) => ({
+      content,
+      listId,
+    }),
+    ADD_LIST: (title: string) => ({
+      title,
+    }),
+    UPDATE_LIST: (title: string, listId: string) => ({
+      title,
+      listId,
+    }),
+    REORDER: (result: DropResult) => ({
+      result,
+    }),
+  },
+  'GET_TODO_LIST',
+  'DELETE_LIST',
 
-    {
-      prefix,
-    }
-  )
+  {
+    prefix,
+  }
+)
 
 export function* todoListSaga() {
   yield takeLatest(`${prefix}/ADD_TODO`, addTodoSaga)
   yield takeLatest(`${prefix}/ADD_LIST`, addListSaga)
   yield takeLatest(`${prefix}/UPDATE_LIST`, updateListSaga)
+  yield takeLatest(`${prefix}/REORDER`, reorderSaga)
   yield takeLatest(`${prefix}/GET_TODO_LIST`, getTodoListSaga)
 }
 
@@ -149,6 +160,27 @@ function* updateListSaga(action: updateListSagaAction) {
       (state: RootState) => state.todoList.todoList
     )
     yield call(TodoListService.updateList, action.payload, todoList)
+    yield put(getTodoList())
+  } catch (error) {
+    yield put(
+      fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))
+    )
+  }
+}
+
+interface reorderSagaAction extends AnyAction {
+  payload: {
+    result: DropResult
+  }
+}
+
+function* reorderSaga(action: reorderSagaAction) {
+  try {
+    yield put(pending())
+    const todoList: ITodoList = yield select(
+      (state: RootState) => state.todoList.todoList
+    )
+    yield call(TodoListService.reorder, action.payload.result, todoList)
     yield put(getTodoList())
   } catch (error) {
     yield put(

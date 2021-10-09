@@ -7,6 +7,7 @@ import {
   ITodoList,
 } from '../interface/todolist'
 import { v4 as uuid } from 'uuid'
+import { DropResult } from 'react-beautiful-dnd'
 
 const LOCALSTORAGE_KEY = 'todolist'
 export default class TodoListService {
@@ -43,6 +44,16 @@ export default class TodoListService {
       title,
       todos: [],
     }
+    if (!todoList) {
+      const newState: ITodoList = {
+        listIds: [newList.id],
+        lists: {
+          [newList.id]: newList,
+        },
+      }
+      TodoListService.setTodoList(newState)
+      return
+    }
     const newState: ITodoList = {
       listIds: [...todoList.listIds, newList.id],
       lists: {
@@ -68,9 +79,36 @@ export default class TodoListService {
     }
     TodoListService.setTodoList(newState)
   }
-  public static deleteList() {
-    const newState = {}
-    // const data = makeReq(newState)
-    // TodoListService.postTodoList(data)
+  public static reorder(
+    { destination, source, draggableId, type }: DropResult,
+    todoList: ITodoList
+  ) {
+    if (type === 'list') {
+      const newListIds = todoList.listIds
+      newListIds.splice(source.index, 1)
+      newListIds.splice(destination!.index, 0, draggableId)
+      const newState: ITodoList = {
+        ...todoList,
+        listIds: newListIds,
+      }
+      TodoListService.setTodoList(newState)
+    } else {
+      const sourceList = todoList.lists[source.droppableId]
+      const destinationList = todoList.lists[destination!.droppableId]
+      const draggingTodo = sourceList.todos.find(
+        todo => todo.id === draggableId
+      ) as ITodo
+      sourceList.todos.splice(source.index, 1)
+      destinationList.todos.splice(destination!.index, 0, draggingTodo)
+      const newState = {
+        ...todoList,
+        lists: {
+          ...todoList.lists,
+          [sourceList.id]: sourceList,
+          [destinationList.id]: destinationList,
+        },
+      }
+      TodoListService.setTodoList(newState)
+    }
   }
 }

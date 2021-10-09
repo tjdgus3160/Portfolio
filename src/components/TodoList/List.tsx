@@ -1,10 +1,11 @@
 import { Paper } from '@material-ui/core'
-import React, { useState } from 'react'
+import React, { useMemo } from 'react'
 import { alpha, makeStyles } from '@material-ui/core/styles'
 import Title from './Title'
 import { IList } from '../../interface/todolist'
 import Todo from './Todo'
-import AddButton from '../AddButton'
+import AddButton from './AddButton'
+import { Droppable } from 'react-beautiful-dnd'
 
 const useStyle = makeStyles(theme => ({
   root: {
@@ -31,16 +32,31 @@ interface Props {
 
 const List = ({ list }: Props) => {
   const classes = useStyle()
+
   if (!list) {
     return <div>Loading...</div>
   }
-  const renderCard = list.todos.map(todo => <Todo key={todo.id} todo={todo} />)
+
+  const todos = list.todos.map((todo, index) => (
+    <Todo key={todo.id} todo={todo} index={index} />
+  ))
 
   return (
     <div>
       <Paper className={classes.root}>
         <Title listId={list.id} />
-        {renderCard}
+        <Droppable droppableId={list.id}>
+          {provided => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className={classes.todoContainer}
+            >
+              {todos}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
         <AddButton listId={list.id} type="todo" />
       </Paper>
     </div>

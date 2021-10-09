@@ -15,6 +15,7 @@ import { addList, addTodo } from '../../redux/modules/todoList'
 
 const useStyle = makeStyles(theme => ({
   root: {
+    width: '280px',
     margin: theme.spacing(0, 1, 1, 1),
     paddingBottom: theme.spacing(4),
   },
