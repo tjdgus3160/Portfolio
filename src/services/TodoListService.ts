@@ -1,5 +1,11 @@
 import axios from 'axios'
-import { ITodo, ITodoForm, ITodoList } from '../interface/todolist'
+import {
+  IList,
+  IListForm,
+  ITodo,
+  ITodoForm,
+  ITodoList,
+} from '../interface/todolist'
 import { v4 as uuid } from 'uuid'
 import SampleData from '../utils/sample/todolist'
 
@@ -15,9 +21,6 @@ export default class TodoListService {
     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data))
   }
 
-  public static addList() {
-    TodoListService.setTodoList(SampleData)
-  }
   public static deleteList() {
     const newState = {}
     // const data = makeReq(newState)
@@ -36,6 +39,22 @@ export default class TodoListService {
       lists: {
         ...todoList.lists,
         [listId]: list,
+      },
+    }
+    TodoListService.setTodoList(newState)
+  }
+
+  public static addList({ content }: IListForm, todoList: ITodoList) {
+    const newList: IList = {
+      id: uuid(),
+      title: content,
+      todos: [],
+    }
+    const newState: ITodoList = {
+      listIds: [...todoList.listIds, newList.id],
+      lists: {
+        ...todoList.lists,
+        [newList.id]: newList,
       },
     }
     TodoListService.setTodoList(newState)

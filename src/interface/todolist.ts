@@ -11,7 +11,10 @@ export interface ITodoList {
   lists: { [index: string]: IList }
   listIds: string[]
 }
-export interface ITodoForm {
+
+export interface IListForm {
   content: string
+}
+export interface ITodoForm extends IListForm {
   listId: string
 }

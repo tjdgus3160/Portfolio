@@ -1,10 +1,10 @@
-import { Collapse, Paper, Typography } from '@material-ui/core'
+import { Paper } from '@material-ui/core'
 import React, { useState } from 'react'
 import { alpha, makeStyles } from '@material-ui/core/styles'
 import Title from './Title'
-import InputBox from './InputBox'
 import { IList } from '../../interface/todolist'
 import Todo from './Todo'
+import AddButton from '../AddButton'
 
 const useStyle = makeStyles(theme => ({
   root: {
@@ -42,18 +42,7 @@ const List = ({ list }: Props) => {
       <Paper className={classes.root}>
         <Title title={list.title} />
         {renderCard}
-        <Collapse in={!open}>
-          <Paper
-            className={classes.addTodo}
-            elevation={0}
-            onClick={() => setOpen(true)}
-          >
-            <Typography>+ Add a Todo</Typography>
-          </Paper>
-        </Collapse>
-        <Collapse in={open}>
-          <InputBox setOpen={setOpen} listId={list.id} />
-        </Collapse>
+        <AddButton listId={list.id} type="todo" />
       </Paper>
     </div>
   )

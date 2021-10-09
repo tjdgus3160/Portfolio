@@ -11,10 +11,10 @@ import ClearIcon from '@material-ui/icons/Clear'
 import { setStateTypes } from '../../types'
 import useInput from '../../hooks/useInput'
 import { useDispatch } from 'react-redux'
-import { addTodo } from '../../redux/modules/todoList'
+import { addList, addTodo } from '../../redux/modules/todoList'
 
 const useStyle = makeStyles(theme => ({
-  wrapper: {
+  root: {
     margin: theme.spacing(0, 1, 1, 1),
     paddingBottom: theme.spacing(4),
   },
@@ -36,36 +36,45 @@ const useStyle = makeStyles(theme => ({
 interface Props {
   setOpen: setStateTypes<boolean>
   listId: string
+  type: string
 }
 
-const InputBox = ({ setOpen, listId }: Props) => {
+const InputBox = ({ setOpen, listId, type }: Props) => {
   const classes = useStyle()
   const [content, onChangeContent, setContent] = useInput('')
 
   const dispatch = useDispatch()
 
   const onBtnClick = useCallback(() => {
-    dispatch(addTodo(content, listId))
+    if (type === 'todo') {
+      dispatch(addTodo(content, listId))
+    } else {
+      dispatch(addList(content))
+    }
     setContent('')
     setOpen(false)
-  }, [dispatch, content, listId, setContent, setOpen])
+  }, [dispatch, content, listId, setContent, setOpen, type])
 
   return (
     <>
-      <Paper className={classes.wrapper}>
+      <Paper className={classes.root}>
         <InputBase
           onChange={onChangeContent}
           multiline
           fullWidth
           inputProps={{ className: classes.input }}
-          placeholder="Enter a title of this card..."
+          placeholder={
+            type === 'list'
+              ? 'Enter a title of this card...'
+              : 'Enter list title...'
+          }
           onBlur={() => setOpen(false)}
           value={content}
         />
       </Paper>
       <div className={classes.btnWrapper}>
         <Button className={classes.btn} onClick={onBtnClick}>
-          Add Card
+          Add {type === 'list' ? 'List' : 'Todo'}
         </Button>
         <IconButton onClick={() => setOpen(false)}>
           <ClearIcon />

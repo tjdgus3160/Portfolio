@@ -1,4 +1,4 @@
-import { ITodoForm, ITodoList } from '../../interface/todolist'
+import { IListForm, ITodoForm, ITodoList } from '../../interface/todolist'
 import { createActions, handleActions } from 'redux-actions'
 import { call, put, select, takeLatest } from 'redux-saga/effects'
 import TodoListService from '../../services/TodoListService'
@@ -52,15 +52,17 @@ const reducer = handleActions<TodoListState, ITodoList>(
 export default reducer
 
 // saga
-export const { addTodo, getTodoList, addList, deleteList } = createActions(
+export const { addTodo, addList, getTodoList, deleteList } = createActions(
   {
     ADD_TODO: (content: string, listId: string) => ({
       content,
       listId,
     }),
+    ADD_LIST: (content: string) => ({
+      content,
+    }),
   },
   'GET_TODO_LIST',
-  'ADD_LIST',
   'DELETE_LIST',
 
   {
@@ -80,18 +82,6 @@ function* getTodoListSaga() {
     yield put(pending())
     const todoList: ITodoList = yield call(TodoListService.getTodoList)
     yield put(success(todoList))
-  } catch (error) {
-    yield put(
-      fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))
-    )
-  }
-}
-
-function* addListSaga() {
-  try {
-    yield put(pending())
-    yield call(TodoListService.addList)
-    yield put(getTodoList())
   } catch (error) {
     yield put(
       fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))
@@ -124,6 +114,25 @@ function* addTodoSaga(action: addTodoSagaAction) {
     yield call(TodoListService.addTodo, action.payload, todoList)
     const newTodoList: ITodoList = yield call(TodoListService.getTodoList)
     yield put(success(newTodoList))
+  } catch (error) {
+    yield put(
+      fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))
+    )
+  }
+}
+
+interface addListSagaAction extends AnyAction {
+  payload: IListForm
+}
+
+function* addListSaga(action: addListSagaAction) {
+  try {
+    yield put(pending())
+    const todoList: ITodoList = yield select(
+      (state: RootState) => state.todoList.todoList
+    )
+    yield call(TodoListService.addList, action.payload, todoList)
+    yield put(getTodoList())
   } catch (error) {
     yield put(
       fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))
