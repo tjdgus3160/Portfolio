@@ -31,7 +31,6 @@ interface Props {
 
 const List = ({ list }: Props) => {
   const classes = useStyle()
-  const [open, setOpen] = useState(false)
   if (!list) {
     return <div>Loading...</div>
   }
@@ -40,7 +39,7 @@ const List = ({ list }: Props) => {
   return (
     <div>
       <Paper className={classes.root}>
-        <Title title={list.title} />
+        <Title listId={list.id} />
         {renderCard}
         <AddButton listId={list.id} type="todo" />
       </Paper>

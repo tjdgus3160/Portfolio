@@ -13,8 +13,12 @@ export interface ITodoList {
 }
 
 export interface IListForm {
-  content: string
+  title: string
 }
-export interface ITodoForm extends IListForm {
+export interface IListUpdateForm extends IListForm {
   listId: string
+}
+export interface ITodoForm {
+  listId: string
+  content: string
 }

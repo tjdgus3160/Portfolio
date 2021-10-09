@@ -1,7 +1,11 @@
 import { InputBase, makeStyles, Typography } from '@material-ui/core'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 import clsx from 'clsx'
+import useInput from '../../hooks/useInput'
+import { useDispatch } from 'react-redux'
+import { updateList } from '../../redux/modules/todoList'
+import useTodoList from '../../hooks/useTodoList'
 
 const useStyle = makeStyles(theme => ({
   root: {
@@ -22,23 +26,34 @@ const useStyle = makeStyles(theme => ({
 }))
 
 interface Props {
-  title: string
+  listId: string
 }
 
-const Title = ({ title }: Props) => {
+const Title = ({ listId }: Props) => {
   const classes = useStyle()
   const [open, setOpen] = useState(false)
+  const todoList = useTodoList()
+  const [title, onChangetitle] = useInput(todoList.lists[listId].title)
+
+  const dispatch = useDispatch()
+
+  const onInputBlur = useCallback(() => {
+    dispatch(updateList(title, listId))
+    setOpen(false)
+  }, [dispatch, title, listId])
+
   return (
     <div className={classes.root}>
       {open ? (
         <InputBase
           value={title}
+          onChange={onChangetitle}
           inputProps={{
             className: clsx(classes.input, classes.title),
           }}
           autoFocus
           fullWidth
-          onBlur={() => setOpen(false)}
+          onBlur={onInputBlur}
         />
       ) : (
         <>

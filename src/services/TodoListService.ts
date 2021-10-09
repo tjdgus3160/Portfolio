@@ -1,13 +1,12 @@
-import axios from 'axios'
 import {
   IList,
   IListForm,
+  IListUpdateForm,
   ITodo,
   ITodoForm,
   ITodoList,
 } from '../interface/todolist'
 import { v4 as uuid } from 'uuid'
-import SampleData from '../utils/sample/todolist'
 
 const LOCALSTORAGE_KEY = 'todolist'
 export default class TodoListService {
@@ -21,11 +20,6 @@ export default class TodoListService {
     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data))
   }
 
-  public static deleteList() {
-    const newState = {}
-    // const data = makeReq(newState)
-    // TodoListService.postTodoList(data)
-  }
   public static addTodo({ content, listId }: ITodoForm, todoList: ITodoList) {
     const newTodo: ITodo = {
       id: uuid(),
@@ -33,7 +27,6 @@ export default class TodoListService {
     }
     const list = todoList.lists[listId]
     list.todos = [...list.todos, newTodo]
-
     const newState: ITodoList = {
       ...todoList,
       lists: {
@@ -44,10 +37,10 @@ export default class TodoListService {
     TodoListService.setTodoList(newState)
   }
 
-  public static addList({ content }: IListForm, todoList: ITodoList) {
+  public static addList({ title }: IListForm, todoList: ITodoList) {
     const newList: IList = {
       id: uuid(),
-      title: content,
+      title,
       todos: [],
     }
     const newState: ITodoList = {
@@ -58,5 +51,26 @@ export default class TodoListService {
       },
     }
     TodoListService.setTodoList(newState)
+  }
+
+  public static updateList(
+    { title, listId }: IListUpdateForm,
+    todoList: ITodoList
+  ) {
+    const list = todoList.lists[listId]
+    list.title = title
+    const newState: ITodoList = {
+      ...todoList,
+      lists: {
+        ...todoList.lists,
+        [listId]: list,
+      },
+    }
+    TodoListService.setTodoList(newState)
+  }
+  public static deleteList() {
+    const newState = {}
+    // const data = makeReq(newState)
+    // TodoListService.postTodoList(data)
   }
 }

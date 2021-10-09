@@ -1,4 +1,9 @@
-import { IListForm, ITodoForm, ITodoList } from '../../interface/todolist'
+import {
+  IListForm,
+  IListUpdateForm,
+  ITodoForm,
+  ITodoList,
+} from '../../interface/todolist'
 import { createActions, handleActions } from 'redux-actions'
 import { call, put, select, takeLatest } from 'redux-saga/effects'
 import TodoListService from '../../services/TodoListService'
@@ -52,29 +57,34 @@ const reducer = handleActions<TodoListState, ITodoList>(
 export default reducer
 
 // saga
-export const { addTodo, addList, getTodoList, deleteList } = createActions(
-  {
-    ADD_TODO: (content: string, listId: string) => ({
-      content,
-      listId,
-    }),
-    ADD_LIST: (content: string) => ({
-      content,
-    }),
-  },
-  'GET_TODO_LIST',
-  'DELETE_LIST',
+export const { addTodo, addList, updateList, getTodoList, deleteList } =
+  createActions(
+    {
+      ADD_TODO: (content: string, listId: string) => ({
+        content,
+        listId,
+      }),
+      ADD_LIST: (title: string) => ({
+        title,
+      }),
+      UPDATE_LIST: (title: string, listId: string) => ({
+        title,
+        listId,
+      }),
+    },
+    'GET_TODO_LIST',
+    'DELETE_LIST',
 
-  {
-    prefix,
-  }
-)
+    {
+      prefix,
+    }
+  )
 
 export function* todoListSaga() {
-  yield takeLatest(`${prefix}/GET_TODO_LIST`, getTodoListSaga)
-  yield takeLatest(`${prefix}/ADD_LIST`, addListSaga)
-  yield takeLatest(`${prefix}/DELETE_LIST`, deleteListSaga)
   yield takeLatest(`${prefix}/ADD_TODO`, addTodoSaga)
+  yield takeLatest(`${prefix}/ADD_LIST`, addListSaga)
+  yield takeLatest(`${prefix}/UPDATE_LIST`, updateListSaga)
+  yield takeLatest(`${prefix}/GET_TODO_LIST`, getTodoListSaga)
 }
 
 function* getTodoListSaga() {
@@ -82,18 +92,6 @@ function* getTodoListSaga() {
     yield put(pending())
     const todoList: ITodoList = yield call(TodoListService.getTodoList)
     yield put(success(todoList))
-  } catch (error) {
-    yield put(
-      fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))
-    )
-  }
-}
-
-function* deleteListSaga() {
-  try {
-    yield put(pending())
-    // yield call(TodoListService.)
-    yield put(getTodoList())
   } catch (error) {
     yield put(
       fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))
@@ -132,6 +130,25 @@ function* addListSaga(action: addListSagaAction) {
       (state: RootState) => state.todoList.todoList
     )
     yield call(TodoListService.addList, action.payload, todoList)
+    yield put(getTodoList())
+  } catch (error) {
+    yield put(
+      fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))
+    )
+  }
+}
+
+interface updateListSagaAction extends AnyAction {
+  payload: IListUpdateForm
+}
+
+function* updateListSaga(action: updateListSagaAction) {
+  try {
+    yield put(pending())
+    const todoList: ITodoList = yield select(
+      (state: RootState) => state.todoList.todoList
+    )
+    yield call(TodoListService.updateList, action.payload, todoList)
     yield put(getTodoList())
   } catch (error) {
     yield put(
