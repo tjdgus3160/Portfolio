@@ -22,3 +22,7 @@ export interface ITodoForm {
   listId: string
   content: string
 }
+
+export interface ITodoUpdateForm extends ITodoForm {
+  todoId: string
+}

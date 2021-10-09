@@ -3,6 +3,7 @@ import {
   IListUpdateForm,
   ITodoForm,
   ITodoList,
+  ITodoUpdateForm,
 } from '../../interface/todolist'
 import { createActions, handleActions } from 'redux-actions'
 import { call, put, select, takeLatest } from 'redux-saga/effects'
@@ -61,6 +62,7 @@ export default reducer
 export const {
   addTodo,
   addList,
+  updateTodo,
   updateList,
   reorder,
   getTodoList,
@@ -73,6 +75,11 @@ export const {
     }),
     ADD_LIST: (title: string) => ({
       title,
+    }),
+    UPDATE_TODO: (content: string, todoId: string, listId: string) => ({
+      content,
+      todoId,
+      listId,
     }),
     UPDATE_LIST: (title: string, listId: string) => ({
       title,
@@ -93,6 +100,7 @@ export const {
 export function* todoListSaga() {
   yield takeLatest(`${prefix}/ADD_TODO`, addTodoSaga)
   yield takeLatest(`${prefix}/ADD_LIST`, addListSaga)
+  yield takeLatest(`${prefix}/UPDATE_TODO`, updateTodoSaga)
   yield takeLatest(`${prefix}/UPDATE_LIST`, updateListSaga)
   yield takeLatest(`${prefix}/REORDER`, reorderSaga)
   yield takeLatest(`${prefix}/GET_TODO_LIST`, getTodoListSaga)
@@ -141,6 +149,25 @@ function* addListSaga(action: addListSagaAction) {
       (state: RootState) => state.todoList.todoList
     )
     yield call(TodoListService.addList, action.payload, todoList)
+    yield put(getTodoList())
+  } catch (error) {
+    yield put(
+      fail(new Error((error as any)?.response?.data?.error || 'UNKNOWN_ERROR'))
+    )
+  }
+}
+
+interface updateTodoSagaAction extends AnyAction {
+  payload: ITodoUpdateForm
+}
+
+function* updateTodoSaga(action: updateTodoSagaAction) {
+  try {
+    yield put(pending())
+    const todoList: ITodoList = yield select(
+      (state: RootState) => state.todoList.todoList
+    )
+    yield call(TodoListService.updateTodo, action.payload, todoList)
     yield put(getTodoList())
   } catch (error) {
     yield put(

@@ -39,17 +39,9 @@ interface Props {
 
 const SideMenu = ({ open, setOpen, setBackground }: Props) => {
   const classes = useStyle()
+
   const [openOption, setOpenOption] = useState<string | null>(null)
-
   const [images, setImages] = useState<any[]>([])
-
-  const changeBackground = useCallback(
-    bg => {
-      TodoListService.setBackground(bg)
-      setBackground(bg)
-    },
-    [setBackground]
-  )
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,6 +50,14 @@ const SideMenu = ({ open, setOpen, setBackground }: Props) => {
     }
     fetchData()
   }, [])
+
+  const changeBackground = useCallback(
+    bg => {
+      TodoListService.setBackground(bg)
+      setBackground(bg)
+    },
+    [setBackground]
+  )
 
   return (
     <Drawer open={open} anchor="right" onClose={() => setOpen(false)}>

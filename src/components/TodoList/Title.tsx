@@ -31,11 +31,11 @@ interface Props {
 
 const Title = ({ listId }: Props) => {
   const classes = useStyle()
-  const [open, setOpen] = useState(false)
   const todoList = useTodoList()
-  const [title, onChangetitle] = useInput(todoList.lists[listId].title)
-
   const dispatch = useDispatch()
+
+  const [open, setOpen] = useState(false)
+  const [title, onChangetitle] = useInput(todoList.lists[listId].title)
 
   const onInputBlur = useCallback(() => {
     dispatch(updateList(title, listId))

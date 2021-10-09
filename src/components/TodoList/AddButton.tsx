@@ -30,7 +30,9 @@ interface Props {
 
 const AddButton = ({ listId, type }: Props) => {
   const classes = useStyle()
+
   const [open, setOpen] = useState(false)
+
   return (
     <div className={classes.root}>
       <Collapse in={open}>

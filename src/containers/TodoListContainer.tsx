@@ -22,6 +22,11 @@ const useStyle = makeStyles(theme => ({
 const TodoListContainer = () => {
   const classes = useStyle()
   const todoList = useTodoList()
+  const dispatch = useDispatch()
+
+  const [open, setOpen] = useState(false)
+  const [background, setBackground] = useState(TodoListService.getBackground())
+
   const lists = useMemo(
     () =>
       todoList?.listIds.map((listId, index) => (
@@ -29,7 +34,6 @@ const TodoListContainer = () => {
       )),
     [todoList]
   )
-  const dispatch = useDispatch()
 
   useEffect(() => {
     dispatch(getTodoList())
@@ -42,8 +46,6 @@ const TodoListContainer = () => {
     },
     [dispatch]
   )
-  const [open, setOpen] = useState(false)
-  const [background, setBackground] = useState(TodoListService.getBackground())
 
   return (
     <div style={{ background }}>

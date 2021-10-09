@@ -5,6 +5,7 @@ import {
   ITodo,
   ITodoForm,
   ITodoList,
+  ITodoUpdateForm,
 } from '../interface/todolist'
 import { v4 as uuid } from 'uuid'
 import { DropResult } from 'react-beautiful-dnd'
@@ -14,12 +15,13 @@ import colors from '../utils/todoList'
 
 const TODOLIST_KEY = 'todolist'
 const BACKGROUND_KEY = 'bg'
+const IMAGE_URL = `https://api.unsplash.com/search/photos?query=Landscape&client_id=${config.unsplashKey}`
+
 export default class TodoListService {
   public static getTodoList(): ITodoList | null {
     const data = localStorage.getItem(TODOLIST_KEY)
     return data ? JSON.parse(data) : null
   }
-
   public static setTodoList(data: ITodoList): void {
     localStorage.removeItem(TODOLIST_KEY)
     localStorage.setItem(TODOLIST_KEY, JSON.stringify(data))
@@ -68,6 +70,26 @@ export default class TodoListService {
     TodoListService.setTodoList(newState)
   }
 
+  public static updateTodo(
+    { content, todoId, listId }: ITodoUpdateForm,
+    todoList: ITodoList
+  ) {
+    const list = todoList.lists[listId]
+    const todo = list.todos.find(todo => todo.id === todoId) as ITodo
+    todo.content = content
+    const newState: ITodoList = {
+      ...todoList,
+      lists: {
+        ...todoList.lists,
+        [listId]: {
+          ...todoList.lists[listId],
+          todos: [...list.todos],
+        },
+      },
+    }
+    TodoListService.setTodoList(newState)
+  }
+
   public static updateList(
     { title, listId }: IListUpdateForm,
     todoList: ITodoList
@@ -83,6 +105,7 @@ export default class TodoListService {
     }
     TodoListService.setTodoList(newState)
   }
+
   public static reorder(
     { destination, source, draggableId, type }: DropResult,
     todoList: ITodoList
@@ -115,11 +138,10 @@ export default class TodoListService {
       TodoListService.setTodoList(newState)
     }
   }
+
   public static async getImages() {
     const page = Math.floor(Math.random() * 20 + 1)
-    const urlImages = `https://api.unsplash.com/search/photos?page=${page}&query=Landscape&client_id=${config.unsplashKey}`
-
-    const res: any = await axios.get(urlImages)
+    const res: any = await axios.get(`${IMAGE_URL}&page=${page}`)
     const photos = res.data.results.map((image: any) => ({
       id: image.id,
       thumb: image.urls.thumb,

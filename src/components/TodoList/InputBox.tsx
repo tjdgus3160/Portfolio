@@ -42,9 +42,9 @@ interface Props {
 
 const InputBox = ({ setOpen, listId, type }: Props) => {
   const classes = useStyle()
-  const [content, onChangeContent, setContent] = useInput('')
-
   const dispatch = useDispatch()
+
+  const [content, onChangeContent, setContent] = useInput('')
 
   const onBtnClick = useCallback(() => {
     if (type === 'todo') {

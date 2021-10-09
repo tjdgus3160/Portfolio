@@ -33,10 +33,11 @@ interface Props {
 
 const List = ({ list, index }: Props) => {
   const classes = useStyle()
+
   const todos = useMemo(
     () =>
       list?.todos.map((todo, index) => (
-        <Todo key={todo.id} todo={todo} index={index} />
+        <Todo key={todo.id} todo={todo} index={index} listId={list.id} />
       )),
     [list]
   )
@@ -44,7 +45,6 @@ const List = ({ list, index }: Props) => {
   if (!list) {
     return <div>Loading...</div>
   }
-
   return (
     <Draggable draggableId={list.id} index={index}>
       {provided => (

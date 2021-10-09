@@ -21,6 +21,7 @@ interface Props {
 
 const TopBar = ({ setOpen }: Props) => {
   const classes = useStyles()
+
   return (
     <AppBar position="static" className={classes.AppBar} elevation={0}>
       <Toolbar>
