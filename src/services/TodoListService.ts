@@ -8,17 +8,21 @@ import {
 } from '../interface/todolist'
 import { v4 as uuid } from 'uuid'
 import { DropResult } from 'react-beautiful-dnd'
+import axios from 'axios'
+import config from '../config/config'
+import colors from '../utils/todoList'
 
-const LOCALSTORAGE_KEY = 'todolist'
+const TODOLIST_KEY = 'todolist'
+const BACKGROUND_KEY = 'bg'
 export default class TodoListService {
   public static getTodoList(): ITodoList | null {
-    const data = localStorage.getItem(LOCALSTORAGE_KEY)
+    const data = localStorage.getItem(TODOLIST_KEY)
     return data ? JSON.parse(data) : null
   }
 
   public static setTodoList(data: ITodoList): void {
-    localStorage.removeItem(LOCALSTORAGE_KEY)
-    localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data))
+    localStorage.removeItem(TODOLIST_KEY)
+    localStorage.setItem(TODOLIST_KEY, JSON.stringify(data))
   }
 
   public static addTodo({ content, listId }: ITodoForm, todoList: ITodoList) {
@@ -110,5 +114,28 @@ export default class TodoListService {
       }
       TodoListService.setTodoList(newState)
     }
+  }
+  public static async getImages() {
+    const page = Math.floor(Math.random() * 20 + 1)
+    const urlImages = `https://api.unsplash.com/search/photos?page=${page}&query=Landscape&client_id=${config.unsplashKey}`
+
+    const res: any = await axios.get(urlImages)
+    const photos = res.data.results.map((image: any) => ({
+      id: image.id,
+      thumb: image.urls.thumb,
+      full: image.urls.full,
+      user: {
+        username: image.user.username,
+        link: image.user.links.html,
+      },
+    }))
+    return photos
+  }
+  public static getBackground(): string {
+    return localStorage.getItem(BACKGROUND_KEY) || colors[3]
+  }
+  public static setBackground(bg: string) {
+    localStorage.removeItem(BACKGROUND_KEY)
+    localStorage.setItem(BACKGROUND_KEY, bg)
   }
 }
