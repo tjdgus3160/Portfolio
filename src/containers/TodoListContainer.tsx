@@ -5,9 +5,7 @@ import AddButton from '../components/TodoList/AddButton'
 import List from '../components/TodoList/List'
 import useTodoList from '../hooks/useTodoList'
 import { getTodoList, reorder } from '../redux/modules/todoList'
-import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { ITodo } from '../interface/todolist'
-import TodoListService from '../services/TodoListService'
+import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd'
 
 const useStyle = makeStyles(theme => ({
   root: {
@@ -24,8 +22,8 @@ const TodoListContainer = () => {
   const todoList = useTodoList()
   const lists = useMemo(
     () =>
-      todoList?.listIds.map(listId => (
-        <List key={listId} list={todoList.lists[listId]} />
+      todoList?.listIds.map((listId, index) => (
+        <List key={listId} list={todoList.lists[listId]} index={index} />
       )),
     [todoList]
   )
@@ -45,11 +43,19 @@ const TodoListContainer = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className={classes.root}>
-        <CssBaseline />
-        {lists}
-        <AddButton type="list" />
-      </div>
+      <Droppable droppableId="app" type="list" direction="horizontal">
+        {provided => (
+          <div
+            className={classes.root}
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+          >
+            <CssBaseline />
+            {lists}
+            <AddButton type="list" />
+          </div>
+        )}
+      </Droppable>
     </DragDropContext>
   )
 }

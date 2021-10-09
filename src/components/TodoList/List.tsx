@@ -5,7 +5,7 @@ import Title from './Title'
 import { IList } from '../../interface/todolist'
 import Todo from './Todo'
 import AddButton from './AddButton'
-import { Droppable } from 'react-beautiful-dnd'
+import { Draggable, Droppable } from 'react-beautiful-dnd'
 
 const useStyle = makeStyles(theme => ({
   root: {
@@ -28,38 +28,46 @@ const useStyle = makeStyles(theme => ({
 
 interface Props {
   list: IList | null
+  index: number
 }
 
-const List = ({ list }: Props) => {
+const List = ({ list, index }: Props) => {
   const classes = useStyle()
+  const todos = useMemo(
+    () =>
+      list?.todos.map((todo, index) => (
+        <Todo key={todo.id} todo={todo} index={index} />
+      )),
+    [list]
+  )
 
   if (!list) {
     return <div>Loading...</div>
   }
 
-  const todos = list.todos.map((todo, index) => (
-    <Todo key={todo.id} todo={todo} index={index} />
-  ))
-
   return (
-    <div>
-      <Paper className={classes.root}>
-        <Title listId={list.id} />
-        <Droppable droppableId={list.id}>
-          {provided => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              className={classes.todoContainer}
-            >
-              {todos}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-        <AddButton listId={list.id} type="todo" />
-      </Paper>
-    </div>
+    <Draggable draggableId={list.id} index={index}>
+      {provided => (
+        <div ref={provided.innerRef} {...provided.draggableProps}>
+          <Paper className={classes.root} {...provided.dragHandleProps}>
+            <Title listId={list.id} />
+            <Droppable droppableId={list.id}>
+              {provided => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className={classes.todoContainer}
+                >
+                  {todos}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+            <AddButton listId={list.id} type="todo" />
+          </Paper>
+        </div>
+      )}
+    </Draggable>
   )
 }
 
